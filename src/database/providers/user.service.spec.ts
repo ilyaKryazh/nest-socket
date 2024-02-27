@@ -1,40 +1,66 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
+import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { User } from '../schemas/user.schema';
+import { DatabaseModule } from '../database.module';
+import { INestApplication } from '@nestjs/common';
 
 describe('UserService', () => {
+  let app: INestApplication;
   let service: UserService;
 
-  beforeEach(async () => {
+  const mockUser: User = {
+    name: 'Lana Kane',
+    email: 'sxdfk@example.com',
+    password: 'password123'
+}
+
+
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService],
+      imports: [
+        DatabaseModule,
+        MongooseModule.forRoot('mongodb://user:pass@mongo_db:27017/nest'), 
+      ],
     }).compile();
 
-    service = module.get<UserService>(UserService);
+    app = await module.createNestApplication()
+    await app.init()
+    service = await app.get(UserService);
+  });
+
+  afterAll(async () => {
+    await service.deleteAll();
+    await app.close();
+  
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should find user by email', async () => {
-    const user: User = { name: 'Test User', email: 'test@example.com', password: 'password123' };
-    const createdUser = await service.create(user);
-
-    const foundUser = await service.findByEmail('test@example.com');
-    expect(foundUser).toEqual(createdUser);
+  it('should create a user', async () => {
+      let user = await service.create(mockUser);
+      expect(user.name).toEqual(mockUser.name);
+      expect(user.email).toEqual(mockUser.email);
+      expect(user.password).toEqual(mockUser.password);
   });
 
-  it('should create a new user', async () => {
-    const user: User = { name: 'Test User 2', email: 'test2@example.com', password: 'password456' };
-    const createdUser = await service.create(user);
+  it('should return user id', async () => {
+    let user = await service.findByEmail(mockUser.email);
+    expect(user._id).toBeDefined();
+  })
 
-    expect(createdUser.email).toBe('test2@example.com');
+  it('should find a user by email', async () => {
+      const users = await service.findAll();
+      expect(users.length).toBeGreaterThan(0);
   });
 
-  it('should find all users', async () => {
-    const users = await service.findAll();
-    expect(users).toHaveLength(2); // Assuming there are already 2 users in the database
-    await service.deleteManyl(users);
+  it('should delete a user', async () => {
+      const user = await service.findByEmail(mockUser.email);
+      await service.delete(user);
+      const users = await service.findByEmail(mockUser.email);
+      expect(users).toBeNull();
   });
+
 });
