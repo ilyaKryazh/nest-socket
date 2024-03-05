@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
 import { UserService } from './providers/user.service';
-import { UtilsService } from './providers/utils.servise';
+import { UtilsService } from '../authentication/utils/utils.servise';
 import { Conversation, ConversationSchema } from './schemas/conversation.schema';
 import { ConversationService } from './providers/conversation.service';
 

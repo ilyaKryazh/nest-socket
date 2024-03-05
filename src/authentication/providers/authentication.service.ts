@@ -1,19 +1,25 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UserService } from "src/database/providers/user.service";
-import { UtilsService } from "src/database/providers/utils.servise";
-import { User } from "src/database/schemas/user.schema";
+import { UtilsService } from "src/authentication/utils/utils.servise";
+import { User, UserDocument } from "src/database/schemas/user.schema";
+import { UserPayload } from "../utils/types/userPayload.type";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthenticationService {
 
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly userService: UserService,
+        private readonly utils: UtilsService,
+        ) {}
 
-    @Inject(UserService)
-    private readonly userService: UserService
+    getAccessToken(user: UserDocument){ 
+        const payload: UserPayload = { userId: user._id, email: user.email };
+        return this.jwtService.sign(payload);
+    }
 
-    @Inject(UtilsService)
-    private readonly utils: UtilsService
-
-    async validateUser(email: string, password: string): Promise<User> {
+    async validateUser(email: string, password: string): Promise<UserDocument> {
         const user = await this.userService.findByEmail(email);
 
         if(!user){
