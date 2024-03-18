@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UserService } from "src/database/providers/user.service";
-import { UtilsService } from "src/authentication/utils/utils.servise";
-import { User, UserDocument } from "src/database/schemas/user.schema";
+import { UserService } from "../../database/providers/user.service";
+import { UtilsService } from "../../authentication/utils/utils.servise";
+import { User, UserDocument } from "../../database/schemas/user.schema";
 import { UserPayload } from "../utils/types/userPayload.type";
 import { JwtService } from "@nestjs/jwt";
 

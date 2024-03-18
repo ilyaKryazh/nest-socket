@@ -1,13 +1,12 @@
 import { Controller, Post, Body, UseGuards, Request, Response } from '@nestjs/common';
 import { AuthenticationService } from './providers/authentication.service';
-import { UserLoginDto } from 'src/authentication/utils/dto/userLogin.dto';;
 import { LocalAuthGuard } from './guards/local.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { RegistrationService } from './providers/registration.service';
 import { UserDto } from './utils/dto/user.dto';
 
 
-@Controller('/')
+@Controller()
 export class AuthenticationController {
   constructor(
     private readonly authService: AuthenticationService,
@@ -21,11 +20,9 @@ export class AuthenticationController {
   }
 
   @Post('register')
-  @UseGuards(JwtAuthGuard)
-  async register(@Body() user: UserDto) {
+  async register(@Body() user: UserDto): Promise<string> {
     return this.regService.register(user);
   }
-
 
 }
 
