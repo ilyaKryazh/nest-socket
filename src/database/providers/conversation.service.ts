@@ -4,13 +4,17 @@ import { Conversation, Message, ConversationDocument } from "../schemas/conversa
 import { UserService } from "./user.service";
 import { ObjectId, Types } from "mongoose";
 
+export type ConversationPayload = {
+    partisipans: Types.ObjectId[],
+    messages?: Message[]
+}
 @Injectable()
 export class ConversationService {
    
     constructor(@InjectModel(Conversation.name) private readonly conversationModel,
     @Inject(UserService) private readonly userService: UserService) {}
 
-    async create(conversation: Conversation): Promise<ConversationDocument> {
+    async create(conversation: ConversationPayload): Promise<ConversationDocument> {
        return await this.conversationModel.create(conversation);
     }
 
@@ -37,6 +41,9 @@ export class ConversationService {
 
     async getConversationByUserId(userId: Types.ObjectId): Promise<ConversationDocument[]> {
         const user = await this.userService.findById(userId);
+        if(!user) {
+            throw new Error('User not found');
+        }
         return await this.conversationModel.find({ partisipans: user }).exec();
     }
 }

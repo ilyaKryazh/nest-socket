@@ -17,7 +17,7 @@ import { JwtStrategy } from './stategies/jwt.strategy';
         })
     ],
     providers: [AuthenticationService, RegistrationService, UtilsService, LocalStrategy, JwtStrategy],
-    exports: [],
+    exports: [AuthenticationService],
     controllers: [AuthenticationController],
 })
 export class AuthenticationModule {}

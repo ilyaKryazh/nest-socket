@@ -20,7 +20,7 @@ export class Conversation {
     partisipans: User[];
     
     @Prop({type: [Message]})
-    messages: Message[]
+    messages?: Message[]
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);
